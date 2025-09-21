@@ -4,18 +4,14 @@ The main difference is that it accepts an `ax` argument, enabling the plotting o
 """
 
 from typing import Literal
+
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import numpy as np
 import pandas as pd
 import scipy.cluster
 import scipy.sparse
 import scipy.spatial
-
 from shap._explanation import Explanation
-from shap.utils import safe_isinstance
-from shap.utils._exceptions import DimensionError
 from shap.plots import colors
 from shap.plots._labels import labels
 from shap.plots._utils import (
@@ -25,6 +21,9 @@ from shap.plots._utils import (
     merge_nodes,
     sort_inds,
 )
+from shap.utils import safe_isinstance
+from shap.utils._exceptions import DimensionError
+
 
 def beeswarm(
     shap_values: Explanation,
@@ -167,7 +166,9 @@ def beeswarm(
             raise DimensionError(shape_msg)
 
     if feature_names is None:
-        feature_names = np.array([labels["FEATURE"] % str(i) for i in range(num_features)])
+        feature_names = np.array(
+            [labels["FEATURE"] % str(i) for i in range(num_features)]
+        )
 
     if ax is None:
         ax = plt.gca()
@@ -212,14 +213,19 @@ def beeswarm(
             clust_order = sort_inds(partition_tree, np.abs(values))
 
             # now relax the requirement to match the partition tree ordering for connections above cluster_threshold
-            dist = scipy.spatial.distance.squareform(scipy.cluster.hierarchy.cophenet(partition_tree))
-            feature_order = get_sort_order(dist, clust_order, cluster_threshold, feature_order)
+            dist = scipy.spatial.distance.squareform(
+                scipy.cluster.hierarchy.cophenet(partition_tree)
+            )
+            feature_order = get_sort_order(
+                dist, clust_order, cluster_threshold, feature_order
+            )
 
             # if the last feature we can display is connected in a tree the next feature then we can't just cut
             # off the feature ordering, so we need to merge some tree nodes and then try again.
             if (
                 max_display < len(feature_order)
-                and dist[feature_order[max_display - 1], feature_order[max_display - 2]] <= cluster_threshold
+                and dist[feature_order[max_display - 1], feature_order[max_display - 2]]
+                <= cluster_threshold
             ):
                 # values, partition_tree, orig_inds = merge_nodes(values, partition_tree, orig_inds)
                 partition_tree, ind1, ind2 = merge_nodes(np.abs(values), partition_tree)
@@ -243,15 +249,28 @@ def beeswarm(
             feature_names_new.append(" + ".join([feature_names[i] for i in inds]))
         else:
             max_ind = np.argmax(np.abs(orig_values).mean(0)[inds])
-            feature_names_new.append(feature_names[inds[max_ind]] + " + %d other features" % (len(inds) - 1))
+            feature_names_new.append(
+                feature_names[inds[max_ind]] + " + %d other features" % (len(inds) - 1)
+            )
     feature_names = feature_names_new
 
     # see how many individual (vs. grouped at the end) features we are plotting
-    include_grouped_remaining = num_features < len(values[0]) and group_remaining_features
+    include_grouped_remaining = (
+        num_features < len(values[0]) and group_remaining_features
+    )
     if include_grouped_remaining:
-        num_cut = np.sum([len(orig_inds[feature_order[i]]) for i in range(num_features - 1, len(values[0]))])
+        num_cut = np.sum(
+            [
+                len(orig_inds[feature_order[i]])
+                for i in range(num_features - 1, len(values[0]))
+            ]
+        )
         values[:, feature_order[num_features - 1]] = np.sum(
-            [values[:, feature_order[i]] for i in range(num_features - 1, len(values[0]))], 0
+            [
+                values[:, feature_order[i]]
+                for i in range(num_features - 1, len(values[0]))
+            ],
+            0,
         )
 
     # build our y-tick labels
@@ -283,14 +302,18 @@ def beeswarm(
             if idx2cat is not None and idx2cat[i]:  # check categorical feature
                 colored_feature = False
             else:
-                fvalues = np.array(fvalues, dtype=np.float64)  # make sure this can be numeric
+                fvalues = np.array(
+                    fvalues, dtype=np.float64
+                )  # make sure this can be numeric
         except Exception:
             colored_feature = False
         N = len(shaps)
         # hspacing = (np.max(shaps) - np.min(shaps)) / 200
         # curr_bin = []
         nbins = 100
-        quant = np.round(nbins * (shaps - np.min(shaps)) / (np.max(shaps) - np.min(shaps) + 1e-8))
+        quant = np.round(
+            nbins * (shaps - np.min(shaps)) / (np.max(shaps) - np.min(shaps) + 1e-8)
+        )
         inds_ = np.argsort(quant + np.random.randn(N) * 1e-6)
         layer = 0
         last_bin = -1
@@ -303,7 +326,11 @@ def beeswarm(
             last_bin = quant[ind]
         ys *= 0.9 * (row_height / np.max(ys + 1))
 
-        if safe_isinstance(color, "matplotlib.colors.Colormap") and features is not None and colored_feature:
+        if (
+            safe_isinstance(color, "matplotlib.colors.Colormap")
+            and features is not None
+            and colored_feature
+        ):
             # trim the color range, but prevent the color range from collapsing
             vmin = np.nanpercentile(fvalues, 5)
             vmax = np.nanpercentile(fvalues, 95)
@@ -365,7 +392,11 @@ def beeswarm(
             )
 
     # draw the color bar
-    if safe_isinstance(color, "matplotlib.colors.Colormap") and color_bar and features is not None:
+    if (
+        safe_isinstance(color, "matplotlib.colors.Colormap")
+        and color_bar
+        and features is not None
+    ):
         import matplotlib.cm as cm
 
         m = cm.ScalarMappable(cmap=color)

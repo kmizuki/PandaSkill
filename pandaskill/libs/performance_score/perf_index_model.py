@@ -1,8 +1,10 @@
-from pandaskill.libs.performance_score.base_model import BaseModel
-from pandaskill.libs.performance_score.percentile_mapper import PercentileMapper
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
+
+from pandaskill.libs.performance_score.base_model import BaseModel
+from pandaskill.libs.performance_score.percentile_mapper import PercentileMapper
+
 
 class PerformanceIndexModel(BaseModel):
     def __init__(self, **kwargs):
@@ -27,14 +29,14 @@ class PerformanceIndexModel(BaseModel):
                 PercentileMapper().train(X[:, feature_index])
             )
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> 'BaseModel':
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "BaseModel":
         self.train_random_forest_classifier(X, y)
         self.learn_data_histograms(X, y)
         return self
-    
+
     def compute_features_importance(self) -> np.ndarray:
         return self.model.feature_importances_
-    
+
     def compute_performance_scores(self, X: np.ndarray) -> np.ndarray:
         num_samples = X.shape[0]
         num_features = X.shape[1]

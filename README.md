@@ -29,9 +29,7 @@ Player performances and ratings can be visualized [here](https://pandaskill.stre
     Create a virtual environment and install dependencies:
 
     ```bash
-    conda create -n pandaskill python=3.12.7
-    conda activate pandaskill
-    pip install -r requirements.txt
+    uv sync --upgrade
     ```
 
 # Data
@@ -105,13 +103,13 @@ Note: every game can be included in a tree structure such that: `Game ⊆ Match 
 To reproduce the results presented in the paper, follow these steps:
 
 1. **Compute the features from the raw data:**
-    - `python pandaskill/experiments/preprocess_data.py`
+    - `uv run pandaskill/experiments/preprocess_data.py`
     - This is optional, as features are already precomputed in `pandaskill/artifacts/data/preprocessing`
 2. **Compute the performance scores for each game:**
-    - `python pandaskill/experiments/run_performance_score_experiment.py`
+    - `uv run pandaskill/experiments/run_performance_score_experiment.py`
     - you can edit the configuration in the file itself, configurations used in the paper are provided
 3. **Compute the skill ratings:**
-    - `python pandaskill/experiments/run_skill_rating_experiment.py`
+    - `uv run pandaskill/experiments/run_skill_rating_experiment.py`
     - you can edit the configuration in the file itself, configurations used in the paper are provided
 
 Results are located in `pandaskill/artifacts/experiments/`. 

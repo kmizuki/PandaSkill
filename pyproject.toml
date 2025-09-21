@@ -1,0 +1,29 @@
+[project]
+name = "pandaskill"
+version = "0.1.0"
+description = "Pandas Skill"
+readme = "README.md"
+requires-python = ">=3.13.7"
+dependencies = [
+    "ruff",
+    "pandas",
+    "polars",
+    "tqdm",
+    "numpy",
+    "scipy",
+    "openskill",
+    "scikit-learn",
+    "shap",
+    "xgboost",
+    "optuna",
+    "lightgbm",
+    "matplotlib",
+    "plotly",
+    "seaborn",
+    "streamlit",
+    "progressbar2",
+    "pytest",
+]
+
+[tool.ruff.lint]
+extend-select = ["I"]
